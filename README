@@ -1,0 +1,21 @@
+adsTeX (c) Tom Hands 2015 - tom.hands@le.ac.uk
+================================================
+ADSTeX is a utility that looks in LaTeX documents for citations, then searches the NASA ADS database for matching papers, and outputs a .bbl file with your completed bibliography in. It's super-super alpha right now (as of writing this I've done maybe 6 hours work on it), but you can try running it on the example.tex file to see what it does.
+- You'll need python3.0 or above
+- In the adstex directory, run 
+> latex example
+and type X to quit when it throws an error
+- Now run
+> python3 adstex.py example
+to generate a bibliographt
+- Re run latex twice to generate a final document.
+
+That's it for now. If using in your own document, either of the following citation styles will work:
+
+\cite{ASurnameBSurname2015JRNL}
+Where A is the first initial of Author A, B is the first initial of Author B, 2015 is the year and JRNL is the ADS abbreviation of the journal name (eg. MNRAS, ApJ)
+
+\cite{2014MNRAS.445.2285D}
+Where the number can be any one of the hugely long ADS IDs.
+
+Have fun!
