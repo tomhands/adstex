@@ -23,14 +23,24 @@ Where A is the first initial of Author A, B is the first initial of Author B,
 if you like, as long as each separate surname starts with a capital
 letter. Look in example.tex for more examples and pick a style you like. Do
 bear in mind that searches may sometimes be degenerate and the script will
-warn you of this. The journal codes seem to be a little hard to come by, so
+warn you of this - always check you are referencing the correct paper! 
+
+If you want to avoid degeneracy altogether, you can always cite the ADS ID: 
+\cite{2014MNRAS.445.2285D}
+Where the number can be any one of the hugely long ADS IDs.
+
+The format of bibliography items is currently provided in the file
+"customcitationformat". This is identical to the format documented on the ADS
+website here:
+http://doc.adsabs.harvard.edu/abs_doc/help_pages/customformat.html , so you
+can construct your own format with ease.
+
+The journal codes seem to be a little hard to come by, so
 I'll keep a list below of ones I've found:
 - Astronomy & Astrophysics - A&A
 - MNRAS - MNRAS (Obviously)
 - IAU Symposium - IAUS
+- ApJ
 
-\cite{2014MNRAS.445.2285D}
-Where the number can be any one of the hugely long ADS IDs.
-
-The format of bibliography items is currently provided in the file "customcitationformat". This is identical to the format documented on the ADS website here: http://doc.adsabs.harvard.edu/abs_doc/help_pages/customformat.html , so you can construct your own format with ease.
 Have fun!
+
