@@ -7,6 +7,13 @@ writing this I've done maybe 6 hours work on it), but you can try running it
 on the example.tex file to see what it does. And please excuse the messy code
 - I wrote this in the middle of job applications, so good python practice
 wasn't the first thing on my mind...
+
+First thing: you're going to need an ADS API key. This key lets adsTeX access
+the ADS API to do searches for citations. Go to the new ADS beta
+(https://ui.adsabs.harvard.edu) and sign up. Then follow this link to get your
+API key: https://ui.adsabs.harvard.edu/#user/settings/token. Now replace the
+contents of the file "apikey" in the adstex directory with your key.
+
 To compile the example document:
 - You'll need python3.0 or above
 - In the adstex directory, run 

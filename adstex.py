@@ -27,7 +27,7 @@ import urllib.parse
 import json
 import sys
 
-apitoken = "UJHKnhig9MTC9mPECsFVAAiNayvaFE8Kr7xwnJmt"
+apitoken = "xxxx"
 journal_dict = { "MNRAS" : 'Monthly Notices of the Royal Astronomical Society', "IAUS" : "IAU Symposium"}
 
 """def custom_ref(bibcode, trunc_in_text = 1, trunc_in_list = 1):
@@ -159,9 +159,13 @@ def generate_bib(filename, bibtex = False):
         f.write("\\begin{thebibliography}{"+str(len(full_refs))+"}\n")
     #Pull references from ADS
     for ref in references:
-        full_ref = get_ref(ref, bibtex)
-        if full_ref != False:
-            full_refs.append(full_ref)
+        try:
+            full_ref = get_ref(ref, bibtex)
+            if full_ref != False:
+                full_refs.append(full_ref)
+        except Exception as inst:
+            print("Failed to retrieve data from ADS. Are you sure your API key is correct, and you are connected to the internet? API token: " + apitoken)
+            print(inst)
     full_refs = sorted(full_refs, key = lambda x: x[1][0]) #Sort by first author
     #Write references to file
     for ref in full_refs:
@@ -169,7 +173,12 @@ def generate_bib(filename, bibtex = False):
     if not bibtex:
         f.write("\n\\end{thebibliography}")
     f.close()
-    
+
+#Read in pi key
+mydir = sys.path[0]
+keyfile = open(sys.path[0]+"/apikey", "r")
+apitoken = keyfile.readline()
+keyfile.close()
 if len(sys.argv) == 3:
     generate_bib(sys.argv[1]+".aux", True)
 else:
