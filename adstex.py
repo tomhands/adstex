@@ -86,7 +86,7 @@ def get_ref(ref_id):
     data = json.loads(resp.read().decode(resp.info().get_param('charset') or 'utf-8'))
     if len(data['response']['docs']) == 0:
         print("Unable to match provided reference to an article!")
-        return ""
+        return False
     if len(data['response']['docs']) > 1:
         print("Warning! Reference was ambiguous, " + str(len(data['response']['docs'])) + " articles found.")
     print("Matched reference " + ref_id + " with ADS entry \n\t"  + data['response']['docs'][0]["title"][0] + "\n\tpublished in " + data['response']['docs'][0]["pub"] + "\n\tby " + str(data['response']['docs'][0]["author"])  )
@@ -98,7 +98,7 @@ def get_ref(ref_id):
     f = open("customcitationformat")
     format = f.read()
     f.close()
-    return request_ref(data['response']['docs'][0]["bibcode"], ref_id, filter, "Custom", format)
+    return (int(data['response']['docs'][0]["year"]), data['response']['docs'][0]["author"], request_ref(data['response']['docs'][0]["bibcode"], ref_id, filter, "Custom", format))
 
 def parse_aux(filename):
     f = open(filename)
@@ -109,14 +109,22 @@ def parse_aux(filename):
     print(m)
     return m
 
+#def paper_comparison
 def generate_bib(filename):
     references = parse_aux(filename)
     full_refs = []
     bib_file_name = filename.split(".")[0] + ".bbl"
     f = open(bib_file_name, 'w')
     f.write("\\begin{thebibliography}{"+str(len(full_refs))+"}\n")
+    #Pull references from ADS
     for ref in references:
-        f.write(get_ref(ref))
+        full_ref = get_ref(ref)
+        if full_ref != False:
+            full_refs.append(full_ref)
+    full_refs = sorted(full_refs, key = lambda x: x[1][0]) #Sort by first author
+    #Write references to file
+    for ref in full_refs:
+        f.write(ref[2])
     f.write("\n\\end{thebibliography}")
     f.close()
     
