@@ -9,6 +9,11 @@ ADSTeX is a utility that looks in LaTeX documents for citations, then searches t
 to generate a bibliographt
 - Re run latex twice to generate a final document.
 
+If you prefer to use BiBTex, adsTeX can generate a .bib file for you. Just run
+adsTeX in this way:
+> python3 adstex.py example bibtex
+and it will generate a .bib file.
+
 That's it for now. If using in your own document, either of the following citation styles will work:
 
 \cite{ASurnameBSurname2015JRNL}

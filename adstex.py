@@ -48,12 +48,15 @@ journal_dict = { "MNRAS" : 'Monthly Notices of the Royal Astronomical Society', 
 
 def request_ref(id, refname=id, db='AST', data_type="MNRAS", format="G"):
     #queryurl = 'http://adsabs.harvard.edu/cgi-bin/nph-abs_connect?bibcode='+id+'&data_type='+format+'&return_fmt=LONG&db_key='+db
-    queryurl = 'http://adsabs.harvard.edu/cgi-bin/nph-abs_connect?bibcode='+id+'&data_type='+data_type+'&format='+urllib.parse.quote(format)+'&return_fmt=LONG&db_key='+db
+    queryurl = 'http://adsabs.harvard.edu/cgi-bin/nph-abs_connect?bibcode='+id+'&data_type='+data_type+'&return_fmt=LONG&db_key='+db
+    if data_type != "BIBTEX":
+        queryurl = queryurl + '&format='+urllib.parse.quote(format)
     ads_req = urllib.request.Request(queryurl)  
     resp = urllib.request.urlopen(ads_req)
     response_string = resp.read().decode(resp.info().get_param('charset') or 'utf-8')
-    print(response_string[response_string.find('\\'):-2])
-    return(response_string[response_string.find('\\'):-1].replace(id,refname))
+    response_string = response_string.split("\n",maxsplit= 4)[4]
+    print(response_string[:-2])
+    return(response_string[:-1].replace(id,refname))
 
 def author_parse(authorlist):
     authors = []
@@ -65,7 +68,7 @@ def author_parse(authorlist):
     author_q = urllib.parse.quote(author_q)
     return author_q
 
-def get_ref(ref_id):
+def get_ref(ref_id, bibtex=False):
     query_url = 'http://api.adsabs.harvard.edu/v1/search/query?'
     print("=========================================================================")
     print("Attempting to find match for latex reference " + ref_id)
@@ -98,7 +101,8 @@ def get_ref(ref_id):
     f = open("customcitationformat")
     format = f.read()
     f.close()
-    return (int(data['response']['docs'][0]["year"]), data['response']['docs'][0]["author"], request_ref(data['response']['docs'][0]["bibcode"], ref_id, filter, "Custom", format))
+    data_type =  "BIBTEX" if bibtex else "Custom"
+    return (int(data['response']['docs'][0]["year"]), data['response']['docs'][0]["author"], request_ref(data['response']['docs'][0]["bibcode"], ref_id, filter, data_type, format))
 
 def parse_aux(filename):
     f = open(filename)
@@ -110,22 +114,29 @@ def parse_aux(filename):
     return m
 
 #def paper_comparison
-def generate_bib(filename):
+def generate_bib(filename, bibtex = False):
     references = parse_aux(filename)
     full_refs = []
-    bib_file_name = filename.split(".")[0] + ".bbl"
+    extension =".bib" if bibtex else ".bbl"
+    bib_file_name = filename.split(".")[0] + extension
     f = open(bib_file_name, 'w')
-    f.write("\\begin{thebibliography}{"+str(len(full_refs))+"}\n")
+    data_type = "BIBTEX"
+    if not bibtex:
+        f.write("\\begin{thebibliography}{"+str(len(full_refs))+"}\n")
     #Pull references from ADS
     for ref in references:
-        full_ref = get_ref(ref)
+        full_ref = get_ref(ref, bibtex)
         if full_ref != False:
             full_refs.append(full_ref)
     full_refs = sorted(full_refs, key = lambda x: x[1][0]) #Sort by first author
     #Write references to file
     for ref in full_refs:
         f.write(ref[2])
-    f.write("\n\\end{thebibliography}")
+    if not bibtex:
+        f.write("\n\\end{thebibliography}")
     f.close()
     
-generate_bib(sys.argv[1]+".aux")
+if len(sys.argv) == 3:
+    generate_bib(sys.argv[1]+".aux", True)
+else:
+    generate_bib(sys.argv[1]+".aux")
