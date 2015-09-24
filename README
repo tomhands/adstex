@@ -35,7 +35,8 @@ warn you of this - always check you are referencing the correct paper!
 If your citation is degenerate, the script will let you know what the other
 options are and how to cite them. For instabnce, attempting to cite the paper AGualandris2012MNRAS will throw a
 warning and suggest that you may have meant the alternative citation,
-AGualandris2012MNRAS1. Though do bear in mind that you can often break
+AGualandris2012MNRAS1. Simply replace your \cite{AGualandris2012MNRAS} with
+\cite{AGualandris2012MNRAS1} and you'll be referencing the other paper. Though do bear in mind that you can often break
 degeneracy by specifying more authors.
 
 If you want to avoid degeneracy altogether, you can always cite the ADS ID: 
