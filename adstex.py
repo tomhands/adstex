@@ -86,7 +86,11 @@ def get_ref(ref_id, bibtex=False):
     if ref_id[0].isnumeric(): #Bibcode
          query = "q=bibcode:"+ref_id+"&fl=title,author,year,bibstem,pub,database,bibcode"
     else: #Author search
-        paper_year = re.search('[0-9]+', ref_id).group(0)
+        paper_year = re.search('[0-9]+', ref_id)
+        if paper_year == None:
+            print("ERROR - You don't appear to have provided a year for this citation... Skipping!")
+            return False
+        paper_year = paper_year.group(0)
         split = re.split(paper_year, ref_id)
         paper_author = split[0]
         paper_journal = split[1]
