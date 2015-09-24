@@ -4,7 +4,6 @@ ADSTeX is a utility that looks in LaTeX documents for citations, then searches t
 - You'll need python3.0 or above
 - In the adstex directory, run 
 > latex example
-and type X to quit when it throws an error
 - Now run
 > python3 adstex.py example
 to generate a bibliographt
@@ -18,4 +17,5 @@ Where A is the first initial of Author A, B is the first initial of Author B, 20
 \cite{2014MNRAS.445.2285D}
 Where the number can be any one of the hugely long ADS IDs.
 
+The format of bibliography items is currently provided in the file "customcitationformat". This is identical to the format documented on the ADS website here: http://doc.adsabs.harvard.edu/abs_doc/help_pages/customformat.html , so you can construct your own format with ease.
 Have fun!

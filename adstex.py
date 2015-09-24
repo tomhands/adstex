@@ -46,66 +46,66 @@ journal_dict = { "MNRAS" : 'Monthly Notices of the Royal Astronomical Society', 
     ref = "\\bibitem[\\protect\\citeauthoryear"
 """
 
-def request_ref(id, refname=id, db='AST', format="MNRAS"):
-    queryurl = 'http://adsabs.harvard.edu/cgi-bin/nph-abs_connect?bibcode='+id+'&data_type='+format+'&return_fmt=LONG&db_key='+db
-    #print(queryurl)
+def request_ref(id, refname=id, db='AST', data_type="MNRAS", format="G"):
+    #queryurl = 'http://adsabs.harvard.edu/cgi-bin/nph-abs_connect?bibcode='+id+'&data_type='+format+'&return_fmt=LONG&db_key='+db
+    queryurl = 'http://adsabs.harvard.edu/cgi-bin/nph-abs_connect?bibcode='+id+'&data_type='+data_type+'&format='+urllib.parse.quote(format)+'&return_fmt=LONG&db_key='+db
     ads_req = urllib.request.Request(queryurl)  
     resp = urllib.request.urlopen(ads_req)
     response_string = resp.read().decode(resp.info().get_param('charset') or 'utf-8')
-    #print(response_string)
     print(response_string[response_string.find('\\'):-2])
     return(response_string[response_string.find('\\'):-1].replace(id,refname))
 
 def author_parse(authorlist):
     authors = []
     author_split = re.findall('[A-Z][A-Z][a-z]+', authorlist)
-    print(authorlist)
-    print(author_split)
     author_q = "("
     for item in author_split:
         author_q = author_q +"\"" + item[1:] + ",+" + item[0] +  "\","
     author_q = author_q + ")"
-    print(author_q)
     author_q = urllib.parse.quote(author_q)
-    #author_q = '%22Hands,+T%,Alexander,+R22'
-    print(author_q)
     return author_q
 
 def get_ref(ref_id):
     query_url = 'http://api.adsabs.harvard.edu/v1/search/query?'
+    print("=========================================================================")
+    print("Attempting to find match for latex reference " + ref_id)
     if ref_id[0].isnumeric(): #Bibcode
-        #print("bibcode search for id " + ref_id)
-        query = "q=bibcode:"+ref_id+"&fl=title,author,year,bibstem,pub,database,bibcode"
+         query = "q=bibcode:"+ref_id+"&fl=title,author,year,bibstem,pub,database,bibcode"
     else: #Author search
-        print(re.search('[0-9]+', ref_id).group(0))
         paper_year = re.search('[0-9]+', ref_id).group(0)
         split = re.split(paper_year, ref_id)
         paper_author = split[0]
         paper_journal = split[1]
-        #if paper_journal in journal_dict:
-        #    paper_journal = journal_dict[paper_journal]
         author_query = author_parse(paper_author)
-        query = "q=author:"+author_query+"&fq="+paper_year+"&fl=title,author,year,bibstem,pub,database,bibcode"
+        query = "q=author:"+author_query+"&fq=year:"+paper_year+"&fl=title,author,year,bibstem,pub,database,bibcode"
         if paper_journal != "":
             query = query + "&fq=bibstem:" +  urllib.parse.quote(paper_journal)
     ads_req = urllib.request.Request(query_url + query)    
     ads_req.add_header("Authorization", "Bearer "+apitoken)
     resp = urllib.request.urlopen(ads_req)
     data = json.loads(resp.read().decode(resp.info().get_param('charset') or 'utf-8'))
-    #print(data)
-    print("Matched paper " + data['response']['docs'][0]["title"][0] + " pub in " + data['response']['docs'][0]["pub"] + " by " + str(data['response']['docs'][0]["author"])  )
+    if len(data['response']['docs']) == 0:
+        print("Unable to match provided reference to an article!")
+        return ""
+    if len(data['response']['docs']) > 1:
+        print("Warning! Reference was ambiguous, " + str(len(data['response']['docs'])) + " articles found.")
+    print("Matched reference " + ref_id + " with ADS entry \n\t"  + data['response']['docs'][0]["title"][0] + "\n\tpublished in " + data['response']['docs'][0]["pub"] + "\n\tby " + str(data['response']['docs'][0]["author"])  )
     filter = "AST"
     if data['response']['docs'][0]["database"] == "physics":
         filter = "PHY"
     elif data['response']['docs'][0]["database"] == "general":
         filter = "GEN"
-    return request_ref(data['response']['docs'][0]["bibcode"], ref_id, filter)
+    f = open("customcitationformat")
+    format = f.read()
+    f.close()
+    return request_ref(data['response']['docs'][0]["bibcode"], ref_id, filter, "Custom", format)
 
 def parse_aux(filename):
     f = open(filename)
     aux = f.read();
     f.close()
     m = re.findall('(?<=\\citation{).+(?=})', aux)
+    m = set(m)
     print(m)
     return m
 
@@ -120,12 +120,4 @@ def generate_bib(filename):
     f.write("\n\\end{thebibliography}")
     f.close()
     
-
 generate_bib(sys.argv[1]+".aux")
-#get_ref("THands2014MNRAS")
-#get_ref("2014MNRAS.445..749H")
-#http://stackoverflow.com/questions/13921910/python-urllib2-receive-json-response-from-url
-#parse_aux("/home/t/toh1/Dropbox/Jobs/research_statement.aux")
-
-#print(resp.read().decode("utf-8"))
-#ast.literal_eval(resp.read().decode("utf-8"))
