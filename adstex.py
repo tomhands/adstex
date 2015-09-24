@@ -48,22 +48,33 @@ journal_dict = { "MNRAS" : 'Monthly Notices of the Royal Astronomical Society', 
 
 def request_ref(id, refname=id, db='AST', data_type="MNRAS", format="G"):
     #queryurl = 'http://adsabs.harvard.edu/cgi-bin/nph-abs_connect?bibcode='+id+'&data_type='+format+'&return_fmt=LONG&db_key='+db
-    queryurl = 'http://adsabs.harvard.edu/cgi-bin/nph-abs_connect?bibcode='+id+'&data_type='+data_type+'&return_fmt=LONG&db_key='+db
+    queryurl = 'http://adsabs.harvard.edu/cgi-bin/nph-abs_connect?bibcode='+urllib.parse.quote(id)+'&data_type='+urllib.parse.quote(data_type)+'&return_fmt=LONG&db_key='+db
+    #print("Querying reference server: "+ queryurl)
     if data_type != "BIBTEX":
         queryurl = queryurl + '&format='+urllib.parse.quote(format)
     ads_req = urllib.request.Request(queryurl)  
     resp = urllib.request.urlopen(ads_req)
     response_string = resp.read().decode(resp.info().get_param('charset') or 'utf-8')
+    #print(response_string[:-2])
     response_string = response_string.split("\n",maxsplit= 4)[4]
     print(response_string[:-2])
     return(response_string[:-1].replace(id,refname))
 
 def author_parse(authorlist):
     authors = []
-    author_split = re.findall('[A-Z][A-Z][a-z]+', authorlist)
+    author_split = re.findall('[A-Z]+[a-z]+', authorlist)
     author_q = "("
-    for item in author_split:
-        author_q = author_q +"\"" + item[1:] + ",+" + item[0] +  "\","
+    if len(author_split) != 0:
+        for item in author_split:
+            caps = re.split('[a-z]+', item)
+            print(caps)
+            extra = "^" if item == author_split[0] else ""
+            if len(caps[0]) == 1:
+                author_q = author_q +"\"" + extra + item[0:] +  "\","
+            elif len(caps[0]) >= 2:
+                author_q = author_q +"\"" + extra + item[1:] + ",+" + item[0] +  "\","
+    else: #We don't have any caps separated authors...
+        author_q = author_q + authorlist
     author_q = author_q + ")"
     author_q = urllib.parse.quote(author_q)
     return author_q
@@ -92,12 +103,13 @@ def get_ref(ref_id, bibtex=False):
         return False
     if len(data['response']['docs']) > 1:
         print("Warning! Reference was ambiguous, " + str(len(data['response']['docs'])) + " articles found.")
-    print("Matched reference " + ref_id + " with ADS entry \n\t"  + data['response']['docs'][0]["title"][0] + "\n\tpublished in " + data['response']['docs'][0]["pub"] + "\n\tby " + str(data['response']['docs'][0]["author"])  )
+    print("Matched reference " + ref_id + " with ADS entry \n\t"  + data['response']['docs'][0]["title"][0] + " (" +data['response']['docs'][0]["bibcode"] + ")" +"\n\tpublished in " + data['response']['docs'][0]["pub"] + "\n\tby " + str(data['response']['docs'][0]["author"])  )
     filter = "AST"
-    if data['response']['docs'][0]["database"] == "physics":
+    if data['response']['docs'][0]["database"] == ["physics"]:
         filter = "PHY"
-    elif data['response']['docs'][0]["database"] == "general":
+    elif data['response']['docs'][0]["database"] == ["general"]:
         filter = "GEN"
+    print("Database filter: " + filter + ", DB: " + str(data['response']['docs'][0]["database"]))
     f = open("customcitationformat")
     format = f.read()
     f.close()
