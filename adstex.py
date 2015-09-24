@@ -57,7 +57,7 @@ def request_ref(id, refname=id, db='AST', data_type="MNRAS", format="G"):
     response_string = resp.read().decode(resp.info().get_param('charset') or 'utf-8')
     #print(response_string[:-2])
     response_string = response_string.split("\n",maxsplit= 4)[4]
-    print(response_string[:-2])
+    #print(response_string[:-2])
     return(response_string[:-1].replace(id,refname))
 
 def author_parse(authorlist):
@@ -67,7 +67,7 @@ def author_parse(authorlist):
     if len(author_split) != 0:
         for item in author_split:
             caps = re.split('[a-z]+', item)
-            print(caps)
+            #print(caps)
             extra = "^" if item == author_split[0] else ""
             if len(caps[0]) == 1:
                 author_q = author_q +"\"" + extra + item[0:] +  "\","
@@ -102,7 +102,7 @@ def get_ref(ref_id, bibtex=False):
         print("Unable to match provided reference to an article!")
         return False
     if len(data['response']['docs']) > 1:
-        print("Warning! Reference was ambiguous, " + str(len(data['response']['docs'])) + " articles found.")
+        print("WARNING! Reference was ambiguous, " + str(len(data['response']['docs'])) + " articles found.")
     print("Matched reference " + ref_id + " with ADS entry \n\t"  + data['response']['docs'][0]["title"][0] + " (" +data['response']['docs'][0]["bibcode"] + ")" +"\n\tpublished in " + data['response']['docs'][0]["pub"] + "\n\tby " + str(data['response']['docs'][0]["author"])  )
     filter = "AST"
     if data['response']['docs'][0]["database"] == ["physics"]:
@@ -122,6 +122,7 @@ def parse_aux(filename):
     f.close()
     m = re.findall('(?<=\\citation{).+(?=})', aux)
     m = set(m)
+    print("List of references required for this document:")
     print(m)
     return m
 

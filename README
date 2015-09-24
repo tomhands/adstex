@@ -17,7 +17,17 @@ and it will generate a .bib file.
 That's it for now. If using in your own document, either of the following citation styles will work:
 
 \cite{ASurnameBSurname2015JRNL}
-Where A is the first initial of Author A, B is the first initial of Author B, 2015 is the year and JRNL is the ADS abbreviation of the journal name (eg. MNRAS, ApJ)
+Where A is the first initial of Author A, B is the first initial of Author B,
+2015 is the year and JRNL is the ADS abbreviation of the journal name
+(eg. MNRAS, ApJ). You can skip the first initials and/or journal code entirely
+if you like, as long as each separate surname starts with a capital
+letter. Look in example.tex for more examples and pick a style you like. Do
+bear in mind that searches may sometimes be degenerate and the script will
+warn you of this. The journal codes seem to be a little hard to come by, so
+I'll keep a list below of ones I've found:
+- Astronomy & Astrophysics - A&A
+- MNRAS - MNRAS (Obviously)
+- IAU Symposium - IAUS
 
 \cite{2014MNRAS.445.2285D}
 Where the number can be any one of the hugely long ADS IDs.
