@@ -1,12 +1,16 @@
 adsTeX (c) Tom Hands 2015 - tom.hands@le.ac.uk
 ================================================
-ADSTeX is a utility that looks in LaTeX documents for citations, then searches the NASA ADS database for matching papers, and outputs a .bbl file with your completed bibliography in. It's super-super alpha right now (as of writing this I've done maybe 6 hours work on it), but you can try running it on the example.tex file to see what it does.
+ADSTeX is a utility that looks in LaTeX documents for citations, then searches
+the NASA ADS database for matching papers, and outputs a .bbl (or bib) file
+with your completed bibliography in. It's super-super alpha right now (as of
+writing this I've done maybe 6 hours work on it), but you can try running it
+on the example.tex file to see what it does. And please excuse the messy code.
 - You'll need python3.0 or above
 - In the adstex directory, run 
 > latex example
 - Now run
 > python3 adstex.py example
-to generate a bibliographt
+to generate a bibliography
 - Re run latex twice to generate a final document.
 
 If you prefer to use BiBTex, adsTeX can generate a .bib file for you. Just run
