@@ -23,7 +23,11 @@ Where A is the first initial of Author A, B is the first initial of Author B,
 if you like, as long as each separate surname starts with a capital
 letter. Look in example.tex for more examples and pick a style you like. Do
 bear in mind that searches may sometimes be degenerate and the script will
-warn you of this - always check you are referencing the correct paper! 
+warn you of this - always check you are referencing the correct paper!
+
+If your citation is degenerate, the script will let you know what the other
+options are and how to cite the paper AGualandris2012MNRAS will throw a
+warning and suggest that you may have meant the alternative citation, AGualandris2012MNRAS1.
 
 If you want to avoid degeneracy altogether, you can always cite the ADS ID: 
 \cite{2014MNRAS.445.2285D}

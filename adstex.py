@@ -79,8 +79,11 @@ def author_parse(authorlist):
     author_q = urllib.parse.quote(author_q)
     return author_q
 
+def print_result(result):
+    print("\t"  + result["title"][0] + " (" +result["bibcode"] + ")" +"\n\tpublished in " + result["pub"] + "\n\tby " + str(result["author"]))
 def get_ref(ref_id, bibtex=False):
     query_url = 'http://api.adsabs.harvard.edu/v1/search/query?'
+    which_paper = -1
     print("=========================================================================")
     print("Attempting to find match for latex reference " + ref_id)
     if ref_id[0].isnumeric(): #Bibcode
@@ -94,6 +97,14 @@ def get_ref(ref_id, bibtex=False):
         split = re.split(paper_year, ref_id)
         paper_author = split[0]
         paper_journal = split[1]
+        which_paper = re.search('[0-9]+', paper_journal)
+        if which_paper==None:
+            which_paper = -1
+            print("No paper selector specified, assuming first search result is correct")
+        else:
+            paper_journal = re.split(which_paper.group(0), paper_journal)[0]
+            which_paper = int(which_paper.group(0))
+            print("Specified paper selector " + str(which_paper) + ", using "  + str(which_paper) + "th search result.")
         author_query = author_parse(paper_author)
         query = "q=author:"+author_query+"&fq=year:"+paper_year+"&fl=title,author,year,bibstem,pub,database,bibcode"
         if paper_journal != "":
@@ -105,20 +116,26 @@ def get_ref(ref_id, bibtex=False):
     if len(data['response']['docs']) == 0:
         print("Unable to match provided reference to an article!")
         return False
-    if len(data['response']['docs']) > 1:
-        print("WARNING! Reference was ambiguous, " + str(len(data['response']['docs'])) + " articles found.")
-    print("Matched reference " + ref_id + " with ADS entry \n\t"  + data['response']['docs'][0]["title"][0] + " (" +data['response']['docs'][0]["bibcode"] + ")" +"\n\tpublished in " + data['response']['docs'][0]["pub"] + "\n\tby " + str(data['response']['docs'][0]["author"])  )
+    if len(data['response']['docs']) > 1 and which_paper == -1:
+        print("!!!!WARNING!!!!! Reference was ambiguous, " + str(len(data['response']['docs'])) + " articles found.")
+        which_paper = 0
+        for i,result in enumerate(data['response']['docs'][1:]):
+            print("Perhaps you meant: \cite{" + ref_id + str(i + 1) + "}")
+            print_result(result)
+    elif len(data['response']['docs']) > 1 and which_paper > -1:
+        print("There were other references that matched the search, but you wanted this one.")
+    print("Matched reference "+ ref_id + " with ADS entry:")
+    print_result(data['response']['docs'][which_paper])
     filter = "AST"
-    if data['response']['docs'][0]["database"] == ["physics"]:
+    if data['response']['docs'][which_paper]["database"] == ["physics"]:
         filter = "PHY"
-    elif data['response']['docs'][0]["database"] == ["general"]:
+    elif data['response']['docs'][which_paper]["database"] == ["general"]:
         filter = "GEN"
-    print("Database filter: " + filter + ", DB: " + str(data['response']['docs'][0]["database"]))
     f = open("customcitationformat")
     format = f.read()
     f.close()
     data_type =  "BIBTEX" if bibtex else "Custom"
-    return (int(data['response']['docs'][0]["year"]), data['response']['docs'][0]["author"], request_ref(data['response']['docs'][0]["bibcode"], ref_id, filter, data_type, format))
+    return (int(data['response']['docs'][which_paper]["year"]), data['response']['docs'][which_paper]["author"], request_ref(data['response']['docs'][which_paper]["bibcode"], ref_id, filter, data_type, format))
 
 def parse_aux(filename):
     f = open(filename)
