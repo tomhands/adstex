@@ -33,7 +33,7 @@ bear in mind that searches may sometimes be degenerate and the script will
 warn you of this - always check you are referencing the correct paper!
 
 If your citation is degenerate, the script will let you know what the other
-options are and how to cite the paper AGualandris2012MNRAS will throw a
+options are and how to cite them. For instabnce, attempting to cite the paper AGualandris2012MNRAS will throw a
 warning and suggest that you may have meant the alternative citation,
 AGualandris2012MNRAS1. Though do bear in mind that you can often break
 degeneracy by specifying more authors.
