@@ -49,13 +49,13 @@ journal_dict = { "MNRAS" : 'Monthly Notices of the Royal Astronomical Society', 
 def request_ref(id, refname=id, db='AST', data_type="MNRAS", format="G"):
     #queryurl = 'http://adsabs.harvard.edu/cgi-bin/nph-abs_connect?bibcode='+id+'&data_type='+format+'&return_fmt=LONG&db_key='+db
     queryurl = 'http://adsabs.harvard.edu/cgi-bin/nph-abs_connect?bibcode='+urllib.parse.quote(id)+'&data_type='+urllib.parse.quote(data_type)+'&return_fmt=LONG&db_key='+db
-    print("Querying reference server: "+ queryurl)
     if data_type != "BIBTEX":
         queryurl = queryurl + '&format='+urllib.parse.quote(format)
+    #print("Querying reference server: "+ queryurl)
     ads_req = urllib.request.Request(queryurl)  
     resp = urllib.request.urlopen(ads_req)
     response_string = resp.read().decode(resp.info().get_param('charset') or 'utf-8')
-    print(response_string[:-2])
+    #print(response_string[:-2])
     response_string = response_string.split("\n",maxsplit= 4)[4]
     #print(response_string[:-2])
     return(response_string[:-1].replace(id,refname))
@@ -84,13 +84,15 @@ def print_result(result):
         print("\t"  + result["title"][0] + " (" +result["bibcode"] + ")" +"\n\tpublished in " + result["pub"] + "\n\tby " + str(result["author"]))
     else:
         print("\t"  + result["title"][0] + " (" +result["bibcode"] + ")" +"\n\tNo publishing data" +  "\n\tby " + str(result["author"]))
+
 def get_ref(ref_id, bibtex=False):
     query_url = 'http://api.adsabs.harvard.edu/v1/search/query?'
     which_paper = -1
     print("=========================================================================")
     print("Attempting to find match for latex reference " + ref_id)
     if ref_id[0].isnumeric(): #Bibcode
-         query = "q=bibcode:"+ref_id+"&fl=title,author,year,bibstem,pub,database,bibcode"
+        print("Searching by bibcode...")
+        query = "q=bibcode:"+urllib.parse.quote(ref_id)+"&fl=title,author,year,bibstem,pub,database,bibcode"
     else: #Author search
         paper_year = re.search('[0-9][0-9][0-9][0-9]', ref_id)
         if paper_year == None:
