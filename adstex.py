@@ -80,7 +80,10 @@ def author_parse(authorlist):
     return author_q
 
 def print_result(result):
-    print("\t"  + result["title"][0] + " (" +result["bibcode"] + ")" +"\n\tpublished in " + result["pub"] + "\n\tby " + str(result["author"]))
+    if "pub" in result:
+        print("\t"  + result["title"][0] + " (" +result["bibcode"] + ")" +"\n\tpublished in " + result["pub"] + "\n\tby " + str(result["author"]))
+    else:
+        print("\t"  + result["title"][0] + " (" +result["bibcode"] + ")" +"\n\tNo publishing data" +  "\n\tby " + str(result["author"]))
 def get_ref(ref_id, bibtex=False):
     query_url = 'http://api.adsabs.harvard.edu/v1/search/query?'
     which_paper = -1
